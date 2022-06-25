@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Post;
 use App\Models\Category;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostRequest;
@@ -35,7 +36,10 @@ class PostController extends Controller
     {   
         $categories= Category::all();
         /* dd($categories); */
-        return view('admin.posts.create', compact('categories'));
+        $tags = Tag::all();
+        /* dd($tags) */
+
+        return view('admin.posts.create', compact('categories', 'tags'));
     }
 
     /**
@@ -47,6 +51,7 @@ class PostController extends Controller
     public function store(PostRequest $request)
     {
         /* dd($request->all()); */
+        /* dd($request->tags); */
 
         //validiamo i dati
         $val_data = $request->validated();
@@ -60,7 +65,8 @@ class PostController extends Controller
         /* dd($val_data); */
 
         //Creiamo la risorsa (resource)
-        Post::create($val_data);
+        $new_post= Post::create($val_data);
+        $new_post->tags()->attach($request->tags);
 
         //rindirizziamo alla rotta get (get route)
         return redirect()->route('admin.posts.index')->with('message', 'Post creato con successo');
@@ -88,7 +94,8 @@ class PostController extends Controller
 
     {
         $categories= Category::all();
-        return view('admin.posts.edit', compact('post', 'categories'));
+        $tags= Tag::all();
+        return view('admin.posts.edit', compact('post', 'categories', 'tags'));
     }
 
     /**

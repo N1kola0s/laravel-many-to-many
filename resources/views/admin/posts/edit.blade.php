@@ -53,6 +53,20 @@
         </select>
     </div>
 
+    <div class="form-group">
+        <label for="tags">Tags</label>
+        <select multiple class="form-control" name="tags[]" id="tags">
+            @if($tags)
+            @foreach($tags as $tag)
+            <option value="{{$tag->id}}" {{$post->tags->contains($tag) ? 'selected' : ''}}>{{$tag->name}}</option>
+            @endforeach
+            @endif
+        </select>
+    </div>
+    @error('tags')
+    <div class="alert alert-danger">{{ $message }}</div>
+    @enderror
+
     <div class="mb-3">
 
         <label for="content">
