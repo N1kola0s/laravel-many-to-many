@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class TagController extends Controller
 {
@@ -15,7 +17,9 @@ class TagController extends Controller
      */
     public function index()
     {
-        //
+        $tags=Tag::orderByDesc('id')->get();
+
+        return view('admin.tags.index', compact('tags'));
     }
 
     /**
@@ -36,7 +40,30 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        //
+         /* dd($request->all()); */
+
+        //Validazione dati
+
+        $val_data= $request->validate([
+            /* 'name' => 'required|unique:categories' */
+            'name'=> ['required', 'unique:tags']
+        ]);
+
+        //Generazione Slug
+
+        $slug = Str::slug($request->name);
+
+        /* dd($slug); */
+
+        $val_data['slug'] = $slug;
+
+        //Salvataggio dati
+
+        Tag::create($val_data);
+
+        //Reindirizzamento
+
+        return redirect()->back()->with('message', "Il tag è stata aggiunto con successo");
     }
 
     /**
@@ -70,7 +97,19 @@ class TagController extends Controller
      */
     public function update(Request $request, Tag $tag)
     {
-        //
+         /* dd($request->all()) */
+
+        //dd($request->all());
+
+        $val_data = $request->validate([
+            'name' => ['required', Rule::unique('tags')->ignore($tag)]
+        ]);
+        // generate slug
+        $slug = Str::slug($request->name);
+        $val_data['slug'] = $slug;
+
+        $tag->update($val_data);
+        return redirect()->back()->with('message', "Il tag '$tag->name' è stato modificato con successo");
     }
 
     /**
@@ -81,6 +120,7 @@ class TagController extends Controller
      */
     public function destroy(Tag $tag)
     {
-        //
+        $tag->delete();
+        return redirect()->back()->with('message', "Il tag '$tag->name' è stato rimosso con successo");
     }
 }
