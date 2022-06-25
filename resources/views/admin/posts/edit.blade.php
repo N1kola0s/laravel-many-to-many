@@ -56,16 +56,20 @@
     <div class="form-group">
         <label for="tags">Tags</label>
         <select multiple class="form-control" name="tags[]" id="tags">
-            @if($tags)
-            @foreach($tags as $tag)
-            <option value="{{$tag->id}}" {{$post->tags->contains($tag) ? 'selected' : ''}}>{{$tag->name}}</option>
-            @endforeach
+            <option value="">Select a tags</option>
+            @forelse ($tags as $tag)
+
+            @if($errors->any())
+            <option value="{{$tag->id}}" {{ in_array($tag->id, old('tags', [])) ? 'selected' : ''}}> {{$tag->name}}</option>
+            @else
+            <option value="{{$tag->id}}" {{ $post->tags->contains($tag->id) ? 'selected' : ''}}> {{$tag->name}}</option>
             @endif
+
+            @empty
+            <option value=""> No Tags</option>
+            @endforelse
         </select>
     </div>
-    @error('tags')
-    <div class="alert alert-danger">{{ $message }}</div>
-    @enderror
 
     <div class="mb-3">
 

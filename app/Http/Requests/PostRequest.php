@@ -30,7 +30,7 @@ class PostRequest extends FormRequest
             'cover' => ['nullable'],
             'content' => ['nullable'],
             'category_id' => ['nullable', 'exists:categories,id'],
-            'tags'=>['exists.tags, id'] 
+            'tags'=>['exists:tags,id'] 
             
         ];
     }

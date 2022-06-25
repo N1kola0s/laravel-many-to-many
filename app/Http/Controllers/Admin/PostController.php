@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostRequest;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 
 class PostController extends Controller
@@ -23,8 +24,9 @@ class PostController extends Controller
         /* $posts= Post::all(); */
         $posts = Post::orderByDesc('id')->get();
         $categories= Category::all();
+        $tags= Tag::all();
        /*  dd($posts); */
-        return view ('admin.posts.index', compact('posts', 'categories'));
+        return view ('admin.posts.index', compact('posts', 'categories','tags'));
     }
 
     /**
@@ -58,6 +60,8 @@ class PostController extends Controller
 
         //Generiamo lo slug
         $slug = Str::slug($request->title,'-');
+        /* $slug = Post::generateSlug($request->title); */
+
         /* dd($slug); */
         $val_data['slug'] = $slug;
 
@@ -110,12 +114,23 @@ class PostController extends Controller
         /* dd($request->all()); */
 
         //validazione dati
-        $val_data=$request->validated();
+        /* $val_data=$request->validated(); */
         /* dd($val_data);  */
+
+        $val_data = $request->validate([
+            'title'=> ['required', Rule::unique('posts')->ignore($post)],
+            'category_id'=> 'nullable|exists:categories,id',
+            'tags'=>'exists:tags,id',
+            'cover'=> 'nullable',
+            'content'=>'nullable',
+        ]);
+
+        /* dd($val_data); */
 
         //generazione dello slug
 
         $slug = Str::slug($request->title,'-');
+       /*  $slug = Post::generateSlug($request->title); */
         /* dd($slug); */
         $val_data['slug'] = $slug;
     
@@ -124,6 +139,8 @@ class PostController extends Controller
        
         $post->update($val_data);
 
+        //sync tags
+        $post->tags()->sync($request->tags);
         // reindirizzamento alla rotta di tipo get
         return redirect()->route('admin.posts.index')->with('message', '$post->title aggiornato con successo');
     }
