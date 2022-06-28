@@ -6,7 +6,7 @@
 
 @include('partials.errors')
 
-<form action="{{route('admin.posts.store')}}" method="post">
+<form action="{{route('admin.posts.store')}}" method="post" enctype="multipart/form-data">
     @csrf
 
     <div class="mb-3">
@@ -29,7 +29,7 @@
             Copertina:
         </label>
 
-        <input type="text" name="cover" id="cover" class="form-control @error('cover') is invalid @enderror" placeholder="es. https://picsum.photos/600/300" aria-describedby="coverHelper" value="{{old('cover')}}">
+        <input type="file" name="cover" id="cover" class="form-control @error('cover') is invalid @enderror" placeholder="es. https://picsum.photos/600/300" aria-describedby="coverHelper">
 
         <small id="coverHelper" class="text-muted">
             Inserisci l'immagine copertina del tuo post

@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\PostRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 
 
 class PostController extends Controller
@@ -71,6 +72,33 @@ class PostController extends Controller
         //Creiamo la risorsa (resource)
         $new_post= Post::create($val_data);
         $new_post->tags()->attach($request->tags);
+
+        //verifichiamo se la richiesta contiene un file
+        /* ddd($request->hasfile('cover')); */
+
+        if($request->hasfile('cover')){
+
+            //validiamo il file
+
+            $request->validate([
+                'cover'=> 'nullable|image|max:500',
+            ]);  
+
+            //salvaggio del file nel filesystem
+
+            //recuperiamo il percorso
+
+            /* ddd($request->all()); */
+            $path = Storage::put('post_images', $request->cover);
+
+            /* ddd($path); */
+
+            //passiamo il percorso all'array di dati validati per il salvataggio della risorsa
+            $val_data['cover']= $path;
+
+        }
+
+        /* dd($val_data); */
 
         //rindirizziamo alla rotta get (get route)
         return redirect()->route('admin.posts.index')->with('message', 'Post creato con successo');
