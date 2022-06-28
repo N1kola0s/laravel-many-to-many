@@ -68,20 +68,12 @@ class PostController extends Controller
 
         /* $val_data['category_id'] = $request->category_id; */
         /* dd($val_data); */
-
-        //Creiamo la risorsa (resource)
-        $new_post= Post::create($val_data);
-        $new_post->tags()->attach($request->tags);
-
-        //verifichiamo se la richiesta contiene un file
-        /* ddd($request->hasfile('cover')); */
-
         if($request->hasfile('cover')){
 
             //validiamo il file
 
             $request->validate([
-                'cover'=> 'nullable|image|max:500',
+                'cover' => 'nullable|image|max:500',
             ]);  
 
             //salvaggio del file nel filesystem
@@ -99,6 +91,14 @@ class PostController extends Controller
         }
 
         /* dd($val_data); */
+
+        //Creiamo la risorsa (resource)
+        $new_post= Post::create($val_data);
+        $new_post->tags()->attach($request->tags);
+
+        //verifichiamo se la richiesta contiene un file
+        /* ddd($request->hasfile('cover')); */
+
 
         //rindirizziamo alla rotta get (get route)
         return redirect()->route('admin.posts.index')->with('message', 'Post creato con successo');
@@ -161,6 +161,27 @@ class PostController extends Controller
        /*  $slug = Post::generateSlug($request->title); */
         /* dd($slug); */
         $val_data['slug'] = $slug;
+
+        if($request->hasfile('cover')){
+            //validazione del file
+
+            $request->validate([
+                'cover'=> 'nullable|image|max:500',
+            ]);
+
+            //salvataggio nel filesystem
+            Storage::delete($post->cover);
+            //recupero del percorso
+
+            /* ddd($request->all()); */
+
+            $path = Storage::put('post_images', $request->cover);
+            /* ddd($path); */
+
+            //passiamo il percorso all'array di dati validati per il salvataggio della risorsa
+            $val_data['cover']= $path;
+
+        }
     
 
         //aggiornamento della risorsa
@@ -170,7 +191,7 @@ class PostController extends Controller
         //sync tags
         $post->tags()->sync($request->tags);
         // reindirizzamento alla rotta di tipo get
-        return redirect()->route('admin.posts.index')->with('message', '$post->title aggiornato con successo');
+        return redirect()->route('admin.posts.index')->with('message', "$post->title aggiornato con successo");
     }
 
     /**
@@ -180,8 +201,9 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy(Post $post)
-    {
+    {   
+        Storage::delete($post->cover);
         $post->delete();
-        return redirect()->route('admin.posts.index')->with('message', '$post->title rimosso con successo');
+        return redirect()->route('admin.posts.index')->with('message', "$post->title rimosso con successo");
     }
 }

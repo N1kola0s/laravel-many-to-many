@@ -57,7 +57,7 @@
                 </td>
 
                 <td>
-                    <img width="70" src="{{asset('storage/'. $post->cover)}}" alt="Cover image {{$post->title}}">
+                    <img width="70" src="{{asset('storage/' . $post->cover)}}" alt="Cover image {{$post->title}}">
                 </td>
 
                 <td class="d-flex flex-column justify-content-center align-items-center" >
