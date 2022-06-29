@@ -11,6 +11,8 @@ use App\Http\Requests\PostRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\NewPostCreated;
+use Illuminate\Support\Facades\Mail;
 
 
 class PostController extends Controller
@@ -98,8 +100,14 @@ class PostController extends Controller
 
         //verifichiamo se la richiesta contiene un file
         /* ddd($request->hasfile('cover')); */
+        
+        //visualizzo il corpo della mail
+        /* return(new NewPostCreated($new_post))->render(); */
 
+        //invio della mail
+        Mail::to('account@mail.com')->send(new NewPostCreated($new_post));
 
+        
         //rindirizziamo alla rotta get (get route)
         return redirect()->route('admin.posts.index')->with('message', 'Post creato con successo');
     }
